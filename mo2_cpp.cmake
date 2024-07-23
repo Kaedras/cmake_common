@@ -39,7 +39,7 @@ function(mo2_configure_warnings TARGET)
 					PRIVATE "/external:anglebrackets" "/external:W${MO2_EXTERNAL}")
 			endif()
 		else()
-			target_compile_options(${TARGET} PRIVATE "-Wall -Wextra")
+			target_compile_options(${TARGET} PRIVATE "-Wall" "-Wextra")
 			# to disable external warnings in gcc, specify SYSTEM
 			# in cmake includes: target_include_directories(<target> SYSTEM ...)
 		endif()

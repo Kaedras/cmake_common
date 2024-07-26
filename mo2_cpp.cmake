@@ -150,6 +150,8 @@ endfunction()
 function(mo2_configure_msvc TARGET)
 
 	if (NOT MSVC)
+		set_target_properties(${TARGET} PROPERTIES
+			CXX_STANDARD 20 CXX_EXTENSIONS OFF)
 		return()
 	endif()
 

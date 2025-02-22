@@ -148,13 +148,6 @@ endfunction()
 # \param:CLI enable C++/CLR (default OFF)
 #
 function(mo2_configure_msvc TARGET)
-
-	if (NOT MSVC)
-		set_target_properties(${TARGET} PROPERTIES
-			CXX_STANDARD 20 CXX_EXTENSIONS OFF)
-		return()
-	endif()
-
 	cmake_parse_arguments(MO2 "" "PERMISSIVE;BIGOBJ;CLI" "" ${ARGN})
 
 	set(CXX_STANDARD 20)
@@ -206,6 +199,34 @@ function(mo2_configure_msvc TARGET)
 
 endfunction()
 
+
+#! mo2_configure_gcc : set flags for C++ target with GCC
+#
+# \param:PERMISSIVE permissive mode (default OFF)
+# \param:BIGOBJ enable bigobj (default OFF)
+#
+function(mo2_configure_gcc TARGET)
+	set_target_properties(${TARGET} PROPERTIES
+		CXX_STANDARD 20 CXX_EXTENSIONS OFF)
+	return()
+
+	if(${MO2_PERMISSIVE})
+		target_compile_options(${TARGET} PRIVATE "-fpermissive")
+	endif()
+
+	if(${MO2_BIGOBJ})
+		target_compile_options(${TARGET} PRIVATE "-Wa,-mbig-obj")
+	endif()
+
+	# set compiler threads to host core count, should be equivalent to "make -j$(nproc)"
+	if (NOT CMAKE_BUILD_PARALLEL_LEVEL)
+		include(ProcessorCount)
+		ProcessorCount(HOST_PROC_COUNT)
+		set(CMAKE_BUILD_PARALLEL_LEVEL ${HOST_PROC_COUNT})
+	endif ()
+
+endfunction()
+
 #! mo2_configure_target : do basic configuration for a MO2 C++ target
 #
 # this functions does many things:
@@ -242,7 +263,11 @@ function(mo2_configure_target TARGET)
 	mo2_set_if_not_defined(MO2_EXTRA_TRANSLATIONS "")
 
 	mo2_configure_warnings(${TARGET} ${ARGN})
-	mo2_configure_msvc(${TARGET} ${ARGN})
+	if (MSVC)
+		mo2_configure_msvc(${TARGET} ${ARGN})
+	else ()
+		mo2_configure_gcc(${TARGET} ${ARGN})
+	endif()
 
 	if (NOT MO2_NO_SOURCES)
 		mo2_configure_sources(${TARGET} ${ARGN})

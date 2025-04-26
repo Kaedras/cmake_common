@@ -3,9 +3,23 @@ cmake_minimum_required(VERSION 3.16)
 if (POLICY CMP0144)
     cmake_policy(SET CMP0144 NEW)
 endif()
+if (POLICY CMP0167)
+    cmake_policy(SET CMP0167 NEW)
+endif()
 
 include(FetchContent)
 include(${CMAKE_CURRENT_LIST_DIR}/mo2_utils.cmake)
+
+# OS dependent strings
+if (UNIX)
+    set(LIB_EXT .so)
+    set(SHARED_EXT .so)
+    set(LIB_PREFIX lib)
+else()
+    set(LIB_EXT .lib)
+    set(SHARED_EXT .dll)
+    set(LIB_PREFIX)
+endif()
 
 #! mo2_add_dependencies : add dependencies to the given target
 #
@@ -40,6 +54,10 @@ function(mo2_add_dependencies TARGET PRIVATE_OR_PUBLIC)
 
 	# handle Qt dependencies
 	if (qt_deps)
+        if (UNIX)
+            set(QT_MAJOR_VERSION 6)
+        endif()
+
 		# remove Qt:: for find_package
 		list(TRANSFORM qt_deps REPLACE "Qt::" "")
 		find_package(Qt${QT_MAJOR_VERSION} COMPONENTS ${qt_deps} REQUIRED)
@@ -98,8 +116,8 @@ function(mo2_find_uibase)
 
         add_library(mo2-uibase IMPORTED SHARED)
         set_target_properties(mo2-uibase PROPERTIES
-            IMPORTED_IMPLIB ${MO2_INSTALL_LIBS_PATH}/uibase.lib
-            IMPORTED_LOCATION ${MO2_INSTALL_PATH}/bin/uibase.dll)
+            IMPORTED_IMPLIB ${MO2_INSTALL_LIBS_PATH}/${LIB_PREFIX}uibase.${LIB_EXT}
+            IMPORTED_LOCATION ${MO2_INSTALL_PATH}/bin/${LIB_PREFIX}uibase.${SHARED_EXT})
         mo2_add_dependencies(mo2-uibase
             INTERFACE Qt::Widgets Qt::Network Qt::QuickWidgets)
         target_include_directories(mo2-uibase
@@ -133,7 +151,7 @@ function(mo2_find_corelib LIBRARY)
 
         add_library(mo2-${LIBRARY} IMPORTED STATIC)
         set_target_properties(mo2-${LIBRARY} PROPERTIES
-            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/${LIBRARY}.lib)
+            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/${LIB_PREFIX}${LIBRARY}.${LIB_EXT})
         target_include_directories(mo2-${LIBRARY}
             INTERFACE ${MO2_SUPER_PATH}/${LIBRARY}/src)
 
@@ -208,7 +226,7 @@ function(mo2_find_gamebryo)
 
         add_library(mo2-gamebryo IMPORTED STATIC)
         set_target_properties(mo2-gamebryo PROPERTIES
-            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/game_gamebryo.lib)
+            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/game_gamebryo.${LIB_EXT})
         target_include_directories(mo2-gamebryo
             INTERFACE ${MO2_SUPER_PATH}/game_gamebryo/src/gamebryo)
 
@@ -242,7 +260,7 @@ function(mo2_find_creation)
 
         add_library(mo2-creation IMPORTED STATIC)
         set_target_properties(mo2-creation PROPERTIES
-            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/game_creation.lib)
+            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/game_creation.${LIB_EXT})
         target_include_directories(mo2-creation
             INTERFACE ${MO2_SUPER_PATH}/game_gamebryo/src/creation)
 
@@ -265,8 +283,8 @@ function(mo2_find_loot)
     find_package(Boost COMPONENTS locale REQUIRED)
 
     add_library(mo2-loot IMPORTED SHARED)
-    set_target_properties(mo2-loot PROPERTIES IMPORTED_LOCATION ${LOOT_PATH}/bin/loot.dll)
-    set_target_properties(mo2-loot PROPERTIES IMPORTED_IMPLIB ${LOOT_PATH}/lib/loot.lib)
+    set_target_properties(mo2-loot PROPERTIES IMPORTED_LOCATION ${LOOT_PATH}/bin/${LIB_PREFIX}loot.${SHARED_EXT})
+    set_target_properties(mo2-loot PROPERTIES IMPORTED_IMPLIB ${LOOT_PATH}/lib/${LIB_PREFIX}loot.${LIB_EXT})
     target_include_directories(mo2-loot INTERFACE ${LOOT_PATH}/include)
     target_link_libraries(mo2-loot INTERFACE ${Boost_LIBRARIES})
     add_library(mo2::loot ALIAS mo2-loot)
@@ -299,10 +317,10 @@ function(mo2_find_directxtex)
 
     add_library(mo2-directxtex IMPORTED STATIC)
     set_target_properties(mo2-directxtex PROPERTIES
-        IMPORTED_LOCATION_DEBUG ${DIRECTXTEX_ROOT}/Lib/Debug/DirectXTex.lib
-        IMPORTED_LOCATION_MINSIZEREL ${DIRECTXTEX_ROOT}/Lib/Release/DirectXTex.lib
-        IMPORTED_LOCATION_RELEASE ${DIRECTXTEX_ROOT}/Lib/Release/DirectXTex.lib
-        IMPORTED_LOCATION_RELWITHDEBINFO ${DIRECTXTEX_ROOT}/Lib/Release/DirectXTex.lib
+        IMPORTED_LOCATION_DEBUG ${DIRECTXTEX_ROOT}/Lib/Debug/DirectXTex.${LIB_EXT}
+        IMPORTED_LOCATION_MINSIZEREL ${DIRECTXTEX_ROOT}/Lib/Release/DirectXTex.${LIB_EXT}
+        IMPORTED_LOCATION_RELEASE ${DIRECTXTEX_ROOT}/Lib/Release/DirectXTex.${LIB_EXT}
+        IMPORTED_LOCATION_RELWITHDEBINFO ${DIRECTXTEX_ROOT}/Lib/Release/DirectXTex.${LIB_EXT}
     )
     target_include_directories(mo2-directxtex INTERFACE ${DIRECTXTEX_ROOT}/Include)
 
@@ -310,25 +328,25 @@ function(mo2_find_directxtex)
 
 endfunction()
 
-#! mo2_find_libbsarch : find and create a mo2::libbsarch target
+#! mo2_find_libbsarchpp : find and create a mo2::libbsarchpp target
 #
-function(mo2_find_libbsarch)
-    if (TARGET mo2-libbsarch)
+function(mo2_find_libbsarchpp)
+    if (TARGET mo2-libbsarchpp)
         return()
     endif()
 
     mo2_find_directxtex()
 
-    mo2_required_variable(NAME LIBBSARCH_ROOT TYPE PATH)
+    mo2_required_variable(NAME LIBBSARCHPP_ROOT TYPE PATH)
 
-    add_library(mo2-libbsarch IMPORTED SHARED)
-    set_target_properties(mo2-libbsarch PROPERTIES
-        IMPORTED_IMPLIB ${LIBBSARCH_ROOT}/libbsarch.lib
-        IMPORTED_LOCATION ${LIBBSARCH_ROOT}/libbsarch.dll
+    add_library(mo2-libbsarchpp IMPORTED SHARED)
+    set_target_properties(mo2-libbsarchpp PROPERTIES
+            IMPORTED_IMPLIB ${LIBBSARCHPP_ROOT}/libbsarchpp.${LIB_EXT}
+            IMPORTED_LOCATION ${LIBBSARCHPP_ROOT}/libbsarchpp.${SHARED_EXT}
     )
-    target_include_directories(mo2-libbsarch INTERFACE ${LIBBSARCH_ROOT})
-    target_link_libraries(mo2-libbsarch INTERFACE ${LIBBSARCH_ROOT}/libbsarch_OOP.lib mo2::DirectXTex)
-    add_library(mo2::libbsarch ALIAS mo2-libbsarch)
+    target_include_directories(mo2-libbsarchpp INTERFACE ${LIBBSARCHPP_ROOT})
+    target_link_libraries(mo2-libbsarchpp INTERFACE ${LIBBSARCHPP_ROOT}/libbsarchpp.${LIB_EXT} mo2::DirectXTex)
+    add_library(mo2::libbsarchpp ALIAS mo2-libbsarchpp)
 
 endfunction()
 
@@ -339,15 +357,19 @@ function(mo2_find_zlib)
         return()
     endif()
 
-    mo2_required_variable(NAME ZLIB_ROOT TYPE PATH)
+    if (UNIX)
+        find_package(ZLIB REQUIRED)
+        add_library(mo2::zlib ALIAS ZLIB::ZLIB)
+    else()
+        mo2_required_variable(NAME ZLIB_ROOT TYPE PATH)
 
-    # not using find_package(ZLIB) because we want the static version
-    add_library(mo2-zlib IMPORTED STATIC)
-    set_target_properties(mo2-zlib PROPERTIES
-        IMPORTED_LOCATION ${ZLIB_ROOT}/lib/zlibstatic.lib)
-    target_include_directories(mo2-zlib INTERFACE ${ZLIB_ROOT}/include)
-    add_library(mo2::zlib ALIAS mo2-zlib)
-
+        # not using find_package(ZLIB) because we want the static version
+        add_library(mo2-zlib IMPORTED STATIC)
+        set_target_properties(mo2-zlib PROPERTIES
+            IMPORTED_LOCATION ${ZLIB_ROOT}/lib/zlibstatic.lib)
+        target_include_directories(mo2-zlib INTERFACE ${ZLIB_ROOT}/include)
+        add_library(mo2::zlib ALIAS mo2-zlib)
+    endif()
 endfunction()
 
 #! mo2_find_lz4 : find and carete a mo2::lz4 target
@@ -357,17 +379,22 @@ function(mo2_find_lz4)
         return()
     endif()
 
-    mo2_required_variable(NAME LZ4_ROOT TYPE PATH)
+    if (UNIX)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(lz4 REQUIRED IMPORTED_TARGET liblz4)
+        add_library(mo2::lz4 ALIAS PkgConfig::lz4)
+    else()
+        mo2_required_variable(NAME LZ4_ROOT TYPE PATH)
 
-    add_library(mo2-lz4 IMPORTED SHARED)
-    set_target_properties(mo2-lz4 PROPERTIES
-        IMPORTED_LOCATION ${LZ4_ROOT}/bin/liblz4.dll
-        IMPORTED_IMPLIB ${LZ4_ROOT}/bin/liblz4.lib
-    )
-    target_include_directories(mo2-lz4 INTERFACE ${LZ4_ROOT}/lib)
+        add_library(mo2-lz4 IMPORTED SHARED)
+        set_target_properties(mo2-lz4 PROPERTIES
+            IMPORTED_LOCATION ${LZ4_ROOT}/bin/liblz4.dll
+            IMPORTED_IMPLIB ${LZ4_ROOT}/bin/liblz4.lib
+        )
+        target_include_directories(mo2-lz4 INTERFACE ${LZ4_ROOT}/lib)
 
-    add_library(mo2::lz4 ALIAS mo2-lz4)
-
+        add_library(mo2::lz4 ALIAS mo2-lz4)
+    endif()
 endfunction()
 
 #! mo2_find_7z : find and carete a mo2::7z target
@@ -429,6 +456,81 @@ function(mo2_find_usvfs)
     target_include_directories(mo2-usvfs INTERFACE ${USVFS_INC_PATH})
 
     add_library(mo2::usvfs ALIAS mo2-usvfs)
+
+endfunction()
+
+#! mo2_find_overlayfs : find and create a mo2::overlayfs target
+#
+function(mo2_find_overlayfs)
+    if (TARGET mo2-overlayfs)
+        return()
+    endif()
+
+    set(OVERLAYFS_PATH "${MO2_BUILD_PATH}/overlayfs")
+    set(OVERLAYFS_INC_PATH "${OVERLAYFS_PATH}/include")
+    set(OVERLAYFS_LIB_PATH "${OVERLAYFS_PATH}/lib")
+
+    add_library(mo2-overlayfs IMPORTED SHARED)
+    set_target_properties(mo2-overlayfs PROPERTIES
+            IMPORTED_LOCATION "${OVERLAYFS_LIB_PATH}/overlayfs.so"
+            IMPORTED_IMPLIB "${OVERLAYFS_LIB_PATH}/overlayfs.so"
+    )
+
+    target_include_directories(mo2-overlayfs INTERFACE ${OVERLAYFS_INC_PATH})
+
+    add_library(mo2::overlayfs ALIAS mo2-overlayfs)
+
+endfunction()
+
+#! mo2_find_ValveFileVDF : find and create a ValveFileVDF target
+#
+function(mo2_find_ValveFileVDF)
+    if (TARGET ValveFileVDF)
+        return()
+    endif()
+
+    include(FetchContent)
+    FetchContent_Declare(
+        ValveFileVDF
+        GIT_REPOSITORY https://github.com/TinyTinni/ValveFileVDF
+        GIT_TAG f1426de29d2522e4428dc0633360c72aae403134
+    )
+    FetchContent_MakeAvailable(ValveFileVDF)
+    add_library(mo2::ValveFileVDF ALIAS ValveFileVDF)
+
+endfunction()
+
+#! mo2_find_flatpak : find and create a mo2-flatpak target
+#
+function(mo2_find_flatpak)
+    if (TARGET mo2-flatpak)
+        return()
+    endif()
+
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(LIBFLATPAK REQUIRED flatpak)
+
+    add_library(mo2-flatpak INTERFACE)
+    target_include_directories(mo2-flatpak INTERFACE ${LIBFLATPAK_INCLUDE_DIRS})
+    target_link_libraries(mo2-flatpak INTERFACE ${LIBFLATPAK_LIBRARIES})
+
+    add_library(mo2::flatpak ALIAS mo2-flatpak)
+
+endfunction()
+
+#! mo2_find_KF6KIO : find and create a mo2-KF6KIO target
+#
+function(mo2_find_KF6KIO)
+    if (TARGET mo2-KF6KIO)
+        return()
+    endif()
+
+    find_package(KF6KIO CONFIG REQUIRED)
+
+    add_library(mo2-KF6KIO INTERFACE)
+    target_link_libraries(mo2-KF6KIO INTERFACE KF6::KIOCore KF6::KIOFileWidgets KF6::KIOWidgets)
+
+    add_library(mo2::KF6KIO ALIAS mo2-KF6KIO)
 
 endfunction()
 

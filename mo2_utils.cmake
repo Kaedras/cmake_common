@@ -22,17 +22,28 @@ endfunction()
 #
 # \param:VARNAME name of the variable that will contain the path to Python
 function(mo2_find_python_executable VARNAME)
-	if (EXISTS "${PYTHON_ROOT}/PCbuild/amd64/python_d.exe")
-		set(${VARNAME} "${PYTHON_ROOT}/PCbuild/amd64/python_d.exe" PARENT_SCOPE)
+	if (UNIX)
+		# "/usr/bin/env python" should always point to python executable
+		set(${VARNAME} "/usr/bin/env python" PARENT_SCOPE)
 	else()
-		set(${VARNAME} "${PYTHON_ROOT}/PCbuild/amd64/python.exe" PARENT_SCOPE)
+		if (EXISTS "${PYTHON_ROOT}/PCbuild/amd64/python_d.exe")
+			set(${VARNAME} "${PYTHON_ROOT}/PCbuild/amd64/python_d.exe" PARENT_SCOPE)
+		else()
+			set(${VARNAME} "${PYTHON_ROOT}/PCbuild/amd64/python.exe" PARENT_SCOPE)
+		endif()
 	endif()
+
 endfunction()
 
 #! mo2_find_windeployqt_executable : find the full path to the windeployqt executable
 #
 # \param:VARNAME name of the variable that will contain the path to Python
 function(mo2_find_windeployqt_executable VARNAME)
+	# only required on windows
+	if (UNIX)
+		return()
+	endif()
+
 	# find_program() does not work for whatever reason, just going for the whole
 	# name
 	set(${VARNAME} ${QT_ROOT}/bin/windeployqt.exe PARENT_SCOPE)
@@ -47,6 +58,10 @@ endfunction()
 # \param:WORKDIR working directory (optional, default is the directory of the executable)
 #
 function(mo2_set_project_to_run_from_install TARGET)
+	if (NOT (CMAKE_GENERATOR MATCHES "Visual Studio"))
+		return()
+	endif()
+
 	cmake_parse_arguments(MO2 "" "EXECUTABLE;WORKDIR" "" ${ARGN})
 
     # extract directory
@@ -130,6 +145,11 @@ endfunction()
 # \param:BINARIES names of the binaries to deploy from
 #
 function(mo2_deploy_qt_for_tests)
+	# only required on windows
+	if (UNIX)
+		return()
+	endif()
+
 	cmake_parse_arguments(DEPLOY "" "TARGET" "BINARIES" ${ARGN})
 
 	mo2_find_windeployqt_executable(windeployqt)
@@ -158,6 +178,11 @@ endfunction()
 # \param:BINARIES names of the binaries (in the install path) to deploy from
 #
 function(mo2_deploy_qt)
+	# only required on windows
+	if (UNIX)
+		return()
+	endif()
+	
 	cmake_parse_arguments(DEPLOY "NOPLUGINS" "" "BINARIES" ${ARGN})
 
 	mo2_find_windeployqt_executable(windeployqt)

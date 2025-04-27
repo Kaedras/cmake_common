@@ -322,10 +322,10 @@ function(mo2_find_directxtex)
 
     add_library(mo2-directxtex IMPORTED STATIC)
     set_target_properties(mo2-directxtex PROPERTIES
-        IMPORTED_LOCATION_DEBUG ${DIRECTXTEX_ROOT}/Lib/Debug/DirectXTex.${LIB_EXT}
-        IMPORTED_LOCATION_MINSIZEREL ${DIRECTXTEX_ROOT}/Lib/Release/DirectXTex.${LIB_EXT}
-        IMPORTED_LOCATION_RELEASE ${DIRECTXTEX_ROOT}/Lib/Release/DirectXTex.${LIB_EXT}
-        IMPORTED_LOCATION_RELWITHDEBINFO ${DIRECTXTEX_ROOT}/Lib/Release/DirectXTex.${LIB_EXT}
+        IMPORTED_LOCATION_DEBUG ${DIRECTXTEX_ROOT}/Lib/Debug/${LIB_PREFIX}DirectXTex.${LIB_EXT}
+        IMPORTED_LOCATION_MINSIZEREL ${DIRECTXTEX_ROOT}/Lib/Release/${LIB_PREFIX}DirectXTex.${LIB_EXT}
+        IMPORTED_LOCATION_RELEASE ${DIRECTXTEX_ROOT}/Lib/Release/${LIB_PREFIX}DirectXTex.${LIB_EXT}
+        IMPORTED_LOCATION_RELWITHDEBINFO ${DIRECTXTEX_ROOT}/Lib/Release/${LIB_PREFIX}DirectXTex.${LIB_EXT}
     )
     target_include_directories(mo2-directxtex INTERFACE ${DIRECTXTEX_ROOT}/Include)
 

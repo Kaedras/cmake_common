@@ -539,6 +539,24 @@ function(mo2_find_KF6KIO)
 
 endfunction()
 
+#! mo2_find_curlpp : find and create a mo2-curlpp target
+#
+function(mo2_find_curlpp)
+    if (TARGET curlpp)
+        return()
+    endif()
+
+    include(FetchContent)
+    FetchContent_Declare(
+        curlpp
+        GIT_REPOSITORY https://github.com/jpbarrette/curlpp
+        GIT_TAG d080e301ec71061c46049d23fedfb8106be3153f # 14.01.2025
+    )
+    FetchContent_MakeAvailable(curlpp)
+    add_library(mo2::curlpp ALIAS curlpp)
+
+endfunction()
+
 #! mo2_find_libraries : find and create libraries to link to
 #
 # this function tries to find the given libraries and generates (if the libraries are

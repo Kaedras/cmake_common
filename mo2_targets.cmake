@@ -557,6 +557,36 @@ function(mo2_find_curlpp)
 
 endfunction()
 
+#! mo2_find_bit7z : find and create a mo2-bit7z target
+#
+function(mo2_find_bit7z)
+    if (TARGET bit7z)
+        return()
+    endif()
+
+    set(BIT7Z_CUSTOM_7ZIP_PATH "${SEVENZ_ROOT}")
+    if(UNIX)
+        # enable position independent code, required to build as shared library
+        set(BIT7Z_GENERATE_PIC ON)
+    endif()
+
+    # Enables the automatic format detection of input archives
+    set(BIT7Z_AUTO_FORMAT ON)
+    # Enables the support for extracting files matching regular expressions
+    set(BIT7Z_REGEX_MATCHING ON)
+    # Enables using the OS native string type (i.e., std::wstring on Windows, std::string elsewhere)
+    set(BIT7Z_USE_NATIVE_STRING ON)
+    include(FetchContent)
+    FetchContent_Declare(
+            bit7z
+            GIT_REPOSITORY https://github.com/rikyoz/bit7z.git
+            GIT_TAG 0f03717920442abcdba80183534931c867feb9c0
+    )
+    FetchContent_MakeAvailable(bit7z)
+    add_library(mo2::bit7z ALIAS bit7z64)
+
+endfunction()
+
 #! mo2_find_libraries : find and create libraries to link to
 #
 # this function tries to find the given libraries and generates (if the libraries are

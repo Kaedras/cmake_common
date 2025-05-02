@@ -351,7 +351,7 @@ function(mo2_find_libbsarchpp)
             IMPORTED_IMPLIB ${LIBBSARCHPP_ROOT}/lib/libbsarchpp.${LIB_EXT}
             IMPORTED_LOCATION ${LIBBSARCHPP_ROOT}/lib/libbsarchpp.${SHARED_EXT}
     )
-    target_include_directories(mo2-libbsarchpp INTERFACE ${LIBBSARCHPP_ROOT})
+    target_include_directories(mo2-libbsarchpp INTERFACE ${LIBBSARCHPP_ROOT}/include)
     target_link_libraries(mo2-libbsarchpp INTERFACE ${LIBBSARCHPP_ROOT}/libbsarchpp.${LIB_EXT} mo2::DirectXTex)
     add_library(mo2::libbsarchpp ALIAS mo2-libbsarchpp)
 

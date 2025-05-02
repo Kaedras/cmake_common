@@ -12,12 +12,12 @@ include(${CMAKE_CURRENT_LIST_DIR}/mo2_utils.cmake)
 
 # OS dependent strings
 if (UNIX)
-    set(LIB_EXT .so)
-    set(SHARED_EXT .so)
+    set(LIB_EXT so)
+    set(SHARED_EXT so)
     set(LIB_PREFIX lib)
 else()
-    set(LIB_EXT .lib)
-    set(SHARED_EXT .dll)
+    set(LIB_EXT lib)
+    set(SHARED_EXT dll)
     set(LIB_PREFIX)
 endif()
 

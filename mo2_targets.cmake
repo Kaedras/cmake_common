@@ -14,10 +14,12 @@ include(${CMAKE_CURRENT_LIST_DIR}/mo2_utils.cmake)
 if (UNIX)
     set(LIB_EXT so)
     set(SHARED_EXT so)
+    set(STATIC_EXT a)
     set(LIB_PREFIX lib)
 else()
     set(LIB_EXT lib)
     set(SHARED_EXT dll)
+    set(STATIC_EXT lib)
     set(LIB_PREFIX)
 endif()
 
@@ -151,7 +153,7 @@ function(mo2_find_corelib LIBRARY)
 
         add_library(mo2-${LIBRARY} IMPORTED STATIC)
         set_target_properties(mo2-${LIBRARY} PROPERTIES
-            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/${LIB_PREFIX}${LIBRARY}.${LIB_EXT})
+            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/${LIB_PREFIX}${LIBRARY}.${STATIC_EXT})
         target_include_directories(mo2-${LIBRARY}
             INTERFACE ${MO2_SUPER_PATH}/${LIBRARY}/src)
 
@@ -226,7 +228,7 @@ function(mo2_find_gamebryo)
 
         add_library(mo2-gamebryo IMPORTED STATIC)
         set_target_properties(mo2-gamebryo PROPERTIES
-            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/game_gamebryo.${LIB_EXT})
+            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/game_gamebryo.${STATIC_EXT})
         target_include_directories(mo2-gamebryo
             INTERFACE ${MO2_SUPER_PATH}/game_gamebryo/src/gamebryo)
 
@@ -260,7 +262,7 @@ function(mo2_find_creation)
 
         add_library(mo2-creation IMPORTED STATIC)
         set_target_properties(mo2-creation PROPERTIES
-            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/game_creation.${LIB_EXT})
+            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/game_creation.${STATIC_EXT})
         target_include_directories(mo2-creation
             INTERFACE ${MO2_SUPER_PATH}/game_gamebryo/src/creation)
 
@@ -322,10 +324,10 @@ function(mo2_find_directxtex)
 
     add_library(mo2-directxtex IMPORTED STATIC)
     set_target_properties(mo2-directxtex PROPERTIES
-        IMPORTED_LOCATION_DEBUG ${DIRECTXTEX_ROOT}/Lib/Debug/${LIB_PREFIX}DirectXTex.${LIB_EXT}
-        IMPORTED_LOCATION_MINSIZEREL ${DIRECTXTEX_ROOT}/Lib/Release/${LIB_PREFIX}DirectXTex.${LIB_EXT}
-        IMPORTED_LOCATION_RELEASE ${DIRECTXTEX_ROOT}/Lib/Release/${LIB_PREFIX}DirectXTex.${LIB_EXT}
-        IMPORTED_LOCATION_RELWITHDEBINFO ${DIRECTXTEX_ROOT}/Lib/Release/${LIB_PREFIX}DirectXTex.${LIB_EXT}
+        IMPORTED_LOCATION_DEBUG ${DIRECTXTEX_ROOT}/Lib/Debug/${LIB_PREFIX}DirectXTex.${STATIC_EXT}
+        IMPORTED_LOCATION_MINSIZEREL ${DIRECTXTEX_ROOT}/Lib/Release/${LIB_PREFIX}DirectXTex.${STATIC_EXT}
+        IMPORTED_LOCATION_RELEASE ${DIRECTXTEX_ROOT}/Lib/Release/${LIB_PREFIX}DirectXTex.${STATIC_EXT}
+        IMPORTED_LOCATION_RELWITHDEBINFO ${DIRECTXTEX_ROOT}/Lib/Release/${LIB_PREFIX}DirectXTex.${STATIC_EXT}
     )
     target_include_directories(mo2-directxtex INTERFACE ${DIRECTXTEX_ROOT}/Include)
 

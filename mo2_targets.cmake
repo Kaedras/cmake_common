@@ -228,7 +228,7 @@ function(mo2_find_gamebryo)
 
         add_library(mo2-gamebryo IMPORTED STATIC)
         set_target_properties(mo2-gamebryo PROPERTIES
-            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/game_gamebryo.${STATIC_EXT})
+            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/${LIB_PREFIX}game_gamebryo.${STATIC_EXT})
         target_include_directories(mo2-gamebryo
             INTERFACE ${MO2_SUPER_PATH}/game_gamebryo/src/gamebryo)
 
@@ -262,7 +262,7 @@ function(mo2_find_creation)
 
         add_library(mo2-creation IMPORTED STATIC)
         set_target_properties(mo2-creation PROPERTIES
-            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/game_creation.${STATIC_EXT})
+            IMPORTED_LOCATION ${MO2_INSTALL_LIBS_PATH}/${LIB_PREFIX}game_creation.${STATIC_EXT})
         target_include_directories(mo2-creation
             INTERFACE ${MO2_SUPER_PATH}/game_gamebryo/src/creation)
 

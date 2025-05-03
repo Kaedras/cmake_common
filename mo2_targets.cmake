@@ -525,6 +525,24 @@ function(mo2_find_flatpak)
 
 endfunction()
 
+#! mo2_find_libsecret : find and create a mo2-libsecret target
+#
+function(mo2_find_libsecret)
+    if (TARGET mo2-libsecret)
+        return()
+    endif()
+
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(LIBSECRET REQUIRED libsecret-1)
+
+    add_library(mo2-libsecret INTERFACE)
+    target_include_directories(mo2-libsecret INTERFACE ${LIBSECRET_INCLUDE_DIRS})
+    target_link_libraries(mo2-libsecret INTERFACE ${LIBSECRET_LIBRARIES})
+
+    add_library(mo2::libsecret ALIAS mo2-libsecret)
+
+endfunction()
+
 #! mo2_find_KF6KIO : find and create a mo2-KF6KIO target
 #
 function(mo2_find_KF6KIO)

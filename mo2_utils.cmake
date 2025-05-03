@@ -317,10 +317,6 @@ function(mo2_add_lupdate TARGET)
 	else()
 		mo2_find_python_executable(PYTHON_EXE)
 		set(lupdate_command ${PYTHON_EXE})
-		if (UNIX)
-			# workaround
-			set(QT_MAJOR_VERSION 6)
-		endif()
 		set(lupdate_args -I -m PyQt${QT_MAJOR_VERSION}.lupdate.pylupdate --ts "${MO2_TS_FILE}" ${translation_files})
 	endif()
 

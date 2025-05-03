@@ -44,6 +44,9 @@ if (WIN32)
 
 	# we add the Qt DLL to the paths for some tools
 	set(ENV{PATH} "${QT_ROOT}/bin;$ENV{PATH}")
+else()
+	# workaround
+	set(QT_MAJOR_VERSION 6)
 endif()
 # custom property, used to keep track of the type of target
 define_property(

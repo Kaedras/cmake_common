@@ -23,8 +23,8 @@ endfunction()
 # \param:VARNAME name of the variable that will contain the path to Python
 function(mo2_find_python_executable VARNAME)
 	if (UNIX)
-		# "/usr/bin/env python" should always point to python executable
-		set(${VARNAME} "/usr/bin/env python" PARENT_SCOPE)
+		# it's reasonable to assume that python is in PATH
+		set(${VARNAME} "python" PARENT_SCOPE)
 	else()
 		if (EXISTS "${PYTHON_ROOT}/PCbuild/amd64/python_d.exe")
 			set(${VARNAME} "${PYTHON_ROOT}/PCbuild/amd64/python_d.exe" PARENT_SCOPE)

@@ -475,12 +475,12 @@ function(mo2_find_overlayfs)
 
     set(OVERLAYFS_PATH "${MO2_BUILD_PATH}/overlayfs")
     set(OVERLAYFS_INC_PATH "${OVERLAYFS_PATH}/include")
-    set(OVERLAYFS_LIB_PATH "${OVERLAYFS_PATH}/lib")
+    set(OVERLAYFS_LIB_PATH "${MO2_INSTALL_PATH}/lib64")
 
     add_library(mo2-overlayfs IMPORTED SHARED)
     set_target_properties(mo2-overlayfs PROPERTIES
-            IMPORTED_LOCATION "${OVERLAYFS_LIB_PATH}/overlayfs.so"
-            IMPORTED_IMPLIB "${OVERLAYFS_LIB_PATH}/overlayfs.so"
+            IMPORTED_LOCATION "${OVERLAYFS_LIB_PATH}/liboverlayfs.so"
+            IMPORTED_IMPLIB "${OVERLAYFS_LIB_PATH}/liboverlayfs.so"
     )
 
     target_include_directories(mo2-overlayfs INTERFACE ${OVERLAYFS_INC_PATH})

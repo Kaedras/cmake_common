@@ -129,11 +129,9 @@ function(mo2_configure_target TARGET)
 
 	if(NOT ${MO2_PERMISSIVE} AND MSVC)
 		target_compile_options(${TARGET} PRIVATE "/permissive-")
-	else()
-		if(NOT MSVC)
-			# permissive defaults to off in gcc
-			target_compile_options(${TARGET} PRIVATE "-fpermissive")
-		endif()
+	elseif(${MO2_PERMISSIVE} AND NOT MSVC)
+		# permissive defaults to off in gcc
+		target_compile_options(${TARGET} PRIVATE "-fpermissive")
 	endif()
 
 	if(${MO2_BIGOBJ})

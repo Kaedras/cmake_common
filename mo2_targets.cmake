@@ -543,6 +543,25 @@ function(mo2_find_libsecret)
 
 endfunction()
 
+#! mo2_find_breakpad : find and create a mo2-breakpad target
+#
+function(mo2_find_breakpad)
+    if (TARGET mo2-breakpad)
+        return()
+    endif()
+
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(BREAKPAD REQUIRED breakpad)
+    pkg_check_modules(BREAKPAD_CLIENT REQUIRED breakpad-client)
+
+    add_library(mo2-breakpad INTERFACE)
+    target_include_directories(mo2-breakpad INTERFACE ${BREAKPAD_INCLUDE_DIRS} ${BREAKPAD_CLIENT_INCLUDE_DIRS})
+    target_link_libraries(mo2-breakpad INTERFACE ${BREAKPAD_LIBRARIES} ${BREAKPAD_CLIENT_LIBRARIES})
+
+    add_library(mo2::breakpad ALIAS mo2-breakpad)
+
+endfunction()
+
 #! mo2_find_KF6KIO : find and create a mo2-KF6KIO target
 #
 function(mo2_find_KF6KIO)

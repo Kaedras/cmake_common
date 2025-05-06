@@ -604,10 +604,6 @@ function(mo2_find_bit7z)
     endif()
 
     set(BIT7Z_CUSTOM_7ZIP_PATH "${SEVENZ_ROOT}")
-    if(UNIX)
-        # enable position independent code, required to build as shared library
-        set(BIT7Z_GENERATE_PIC ON)
-    endif()
 
     # Enables the automatic format detection of input archives
     set(BIT7Z_AUTO_FORMAT ON)

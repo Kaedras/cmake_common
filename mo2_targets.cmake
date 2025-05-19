@@ -596,6 +596,30 @@ function(mo2_find_curlpp)
 
 endfunction()
 
+#! mo2_find_curl : find and create a curl target
+#
+function(mo2_find_curl)
+    if (TARGET curl)
+        return()
+    endif()
+
+    find_package(CURL)
+
+    if(NOT CURL_FOUND)
+        # Only fetch if system CURL was not found
+        include(FetchContent)
+        FetchContent_Declare(
+                curl
+                GIT_REPOSITORY https://github.com/curl/curl
+                GIT_TAG curl-8_12_1
+        )
+        FetchContent_MakeAvailable(curl)
+    endif()
+
+    add_library(mo2::curl ALIAS CURL::libcurl)
+
+endfunction()
+
 #! mo2_find_bit7z : find and create a mo2-bit7z target
 #
 function(mo2_find_bit7z)

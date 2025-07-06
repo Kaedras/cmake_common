@@ -158,6 +158,10 @@ endfunction()
 # \param:CLI enable C++/CLR (default OFF)
 #
 function(mo2_configure_msvc TARGET)
+	if (NOT MSVC)
+		return()
+	endif()
+
 	cmake_parse_arguments(MO2 "" "PERMISSIVE;BIGOBJ;CLI" "" ${ARGN})
 
 	set(CXX_STANDARD 20)

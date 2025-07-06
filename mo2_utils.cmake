@@ -48,10 +48,15 @@ endfunction()
 #
 # \param:VARNAME name of the variable that will contain the path to Python
 function(mo2_find_python_executable VARNAME)
-	if (NOT DEFINED Python_EXECUTABLE)
-		find_package(Python ${MO2_PYTHON_VERSION} COMPONENTS Interpreter REQUIRED)
+	if (UNIX)
+		# it's reasonable to assume that python is in PATH
+		set(${VARNAME} "python" PARENT_SCOPE)
+	else()
+		if (NOT DEFINED Python_EXECUTABLE)
+			find_package(Python ${MO2_PYTHON_VERSION} COMPONENTS Interpreter REQUIRED)
+		endif()
+		set(${VARNAME} ${Python_EXECUTABLE} PARENT_SCOPE)
 	endif()
-	set(${VARNAME} ${Python_EXECUTABLE} PARENT_SCOPE)
 endfunction()
 
 #! mo2_find_git_hash : find the git hash of HEAD on the current source project

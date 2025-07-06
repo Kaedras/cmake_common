@@ -116,7 +116,19 @@ function(mo2_configure_sources TARGET)
 	file(GLOB_RECURSE ui_header_files CONFIGURE_DEPENDS ${UI_HEADERS_DIR}/*.h)
 	file(GLOB_RECURSE rule_files CONFIGURE_DEPENDS ${CMAKE_BINARY_DIR}/*.rule)
 
-
+	# exclude os-specific files
+	if (UNIX)
+		set(EXCLUDE_FILTER "win32")
+	else ()
+		set(EXCLUDE_FILTER "linux")
+	endif ()
+	list(FILTER source_files EXCLUDE REGEX ${EXCLUDE_FILTER})
+	list(FILTER header_files EXCLUDE REGEX ${EXCLUDE_FILTER})
+	list(FILTER qrc_files EXCLUDE REGEX ${EXCLUDE_FILTER})
+	list(FILTER rc_files EXCLUDE REGEX ${EXCLUDE_FILTER})
+	list(FILTER ui_files EXCLUDE REGEX ${EXCLUDE_FILTER})
+	list(FILTER ui_header_files EXCLUDE REGEX ${EXCLUDE_FILTER})
+	list(FILTER rule_files EXCLUDE REGEX ${EXCLUDE_FILTER})
 
 	if (${MO2_SOURCE_TREE})
 		mo2_default_source_group(NO_SRC)

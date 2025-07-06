@@ -16,8 +16,10 @@ endif()
 include(${CMAKE_CURRENT_LIST_DIR}/mo2_versions.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/mo2_utils.cmake)
 
-# this makes VS install everything when building solution
-set(CMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD 1)
+if (MSVC)
+	# this makes VS install everything when building solution
+	set(CMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD 1)
+endif()
 
 # this find Python globally rather than virtual environments, even when one is active
 set(Python_FIND_VIRTUALENV STANDARD)

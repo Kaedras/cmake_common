@@ -220,9 +220,14 @@ endfunction()
 # \param:BIGOBJ enable bigobj (default OFF)
 #
 function(mo2_configure_gcc TARGET)
+    if (NOT GNUC)
+        return()
+    endif()
+
+    cmake_parse_arguments(MO2 "" "PERMISSIVE;BIGOBJ" "" ${ARGN})
+
 	set_target_properties(${TARGET} PROPERTIES
 		CXX_STANDARD 20 CXX_EXTENSIONS OFF)
-	return()
 
 	if(${MO2_PERMISSIVE})
 		target_compile_options(${TARGET} PRIVATE "-fpermissive")

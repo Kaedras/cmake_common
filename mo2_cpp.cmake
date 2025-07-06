@@ -40,8 +40,6 @@ function(mo2_configure_warnings TARGET)
 			endif()
 		else()
 			target_compile_options(${TARGET} PRIVATE "-Wall" "-Wextra")
-			# to disable external warnings in gcc, specify SYSTEM
-			# in cmake includes: target_include_directories(<target> SYSTEM ...)
 		endif()
 	endif()
 
@@ -218,7 +216,7 @@ function(mo2_configure_gcc TARGET)
 		target_compile_options(${TARGET} PRIVATE "-Wa,-mbig-obj")
 	endif()
 
-	# set compiler threads to host core count, should be equivalent to "make -j$(nproc)"
+	# set compiler threads to host core count
 	if (NOT CMAKE_BUILD_PARALLEL_LEVEL)
 		include(ProcessorCount)
 		ProcessorCount(HOST_PROC_COUNT)
@@ -380,8 +378,8 @@ function(mo2_install_plugin TARGET)
 
 	if (NOT MO2_INSTALL_IS_BIN)
 		install(TARGETS ${TARGET} ARCHIVE DESTINATION lib)
-		# install PDB if possible
-		if(WIN32)
+		if (WIN32)
+			# install PDB if possible
 			install(FILES $<TARGET_PDB_FILE:${TARGET}> DESTINATION pdb OPTIONAL)
 		endif()
 	endif()

@@ -244,6 +244,13 @@ function(mo2_configure_gcc TARGET)
 		set(CMAKE_BUILD_PARALLEL_LEVEL ${HOST_PROC_COUNT})
 	endif ()
 
+	# enable link-time optimization
+    target_link_options(${TARGET}
+            PRIVATE
+            $<$<CONFIG:Release,RelWithDebInfo>:
+            -flto=auto
+            >)
+
 endfunction()
 
 #! mo2_configure_target : do basic configuration for a MO2 C++ target

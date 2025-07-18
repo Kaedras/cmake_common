@@ -25,7 +25,7 @@ function(mo2_configure_warnings TARGET)
 	endif()
 
 	if(NOT (${MO2_WARNINGS} STREQUAL "OFF"))
-		if (MSVC)
+		if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 			string(TOLOWER ${MO2_WARNINGS} MO2_WARNINGS)
 			target_compile_options(${TARGET} PRIVATE "/W${MO2_WARNINGS}" "/wd4464")
 

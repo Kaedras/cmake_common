@@ -99,7 +99,7 @@ endfunction()
 # \param:WORKDIR working directory (optional, default is the directory of the executable)
 #
 function(mo2_set_project_to_run_from_install TARGET)
-	if (NOT MSVC)
+	if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		return()
 	endif()
 

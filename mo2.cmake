@@ -16,7 +16,7 @@ endif()
 include(${CMAKE_CURRENT_LIST_DIR}/mo2_utils.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/mo2_versions.cmake)
 
-if (MSVC)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	# this makes VS install everything when building solution
 	set(CMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD 1)
 endif()

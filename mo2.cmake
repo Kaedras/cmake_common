@@ -13,8 +13,8 @@ else()
 	set(MO2_INSTALL_BIN "bin")
 endif()
 
-include(${CMAKE_CURRENT_LIST_DIR}/mo2_versions.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/mo2_utils.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/mo2_versions.cmake)
 
 if (MSVC)
 	# this makes VS install everything when building solution

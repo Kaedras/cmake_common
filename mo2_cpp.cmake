@@ -158,10 +158,6 @@ endfunction()
 # \param:CLI enable C++/CLR (default OFF)
 #
 function(mo2_configure_msvc TARGET)
-	if (NOT MSVC)
-		return()
-	endif()
-
 	cmake_parse_arguments(MO2 "" "PERMISSIVE;BIGOBJ;CLI" "" ${ARGN})
 
 	set(CXX_STANDARD 20)
@@ -220,10 +216,6 @@ endfunction()
 # \param:BIGOBJ enable bigobj (default OFF)
 #
 function(mo2_configure_gcc TARGET)
-    if (NOT GNUC)
-        return()
-    endif()
-
     cmake_parse_arguments(MO2 "" "PERMISSIVE;BIGOBJ" "" ${ARGN})
 
 	set_target_properties(${TARGET} PROPERTIES
@@ -289,10 +281,12 @@ function(mo2_configure_target TARGET)
 	mo2_set_if_not_defined(MO2_EXTRA_TRANSLATIONS "")
 
 	mo2_configure_warnings(${TARGET} ${ARGN})
-	if (MSVC)
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 		mo2_configure_msvc(${TARGET} ${ARGN})
-	else ()
+	elseif (CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang)$")
 		mo2_configure_gcc(${TARGET} ${ARGN})
+	else ()
+		message(FATAL_ERROR "Unsupported compiler ${CMAKE_CXX_COMPILER_ID}")
 	endif()
 
 	if (NOT MO2_NO_SOURCES)

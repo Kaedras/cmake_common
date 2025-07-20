@@ -94,6 +94,10 @@ endfunction()
 # \param:WORKDIR working directory (optional, default is the directory of the executable)
 #
 function(mo2_set_project_to_run_from_install TARGET)
+	if (NOT CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+		return()
+	endif()
+
 	cmake_parse_arguments(MO2 "" "EXECUTABLE;WORKDIR" "" ${ARGN})
 
     # extract directory
@@ -144,7 +148,11 @@ function(mo2_add_filter)
 		set(files ${files} ${f}.cpp ${f}.h ${f}.inc)
 	endforeach()
 
-	string(REPLACE "/" "\\" filter_name ${add_filter_NAME})
+	if (WIN32)
+		string(REPLACE "/" "\\" filter_name ${add_filter_NAME})
+	else()
+		set(filter_name ${add_filter_NAME})
+	endif()
 	source_group(${filter_name} FILES ${files})
 endfunction()
 
@@ -156,6 +164,10 @@ endfunction()
 # \param:BINARIES names of the binaries to deploy from
 #
 function(mo2_deploy_qt_for_tests)
+	if(NOT WIN32)
+		return()
+	endif()
+
 	cmake_parse_arguments(DEPLOY "" "TARGET" "BINARIES" ${ARGN})
 
 	mo2_find_qt_executable(windeployqt windeployqt)
@@ -186,6 +198,10 @@ endfunction()
 # \param:BINARIES names of the binaries (in the install path) to deploy from
 #
 function(mo2_deploy_qt)
+	if(NOT WIN32)
+		return()
+	endif()
+
 	cmake_parse_arguments(DEPLOY "NOPLUGINS" "DIRECTORY" "BINARIES" ${ARGN})
 
 	mo2_set_if_not_defined(DEPLOY_DIRECTORY "${MO2_INSTALL_BIN}")

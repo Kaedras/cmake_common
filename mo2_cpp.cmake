@@ -25,17 +25,21 @@ function(mo2_configure_warnings TARGET)
 	endif()
 
 	if(NOT (${MO2_WARNINGS} STREQUAL "OFF"))
-		string(TOLOWER ${MO2_WARNINGS} MO2_WARNINGS)
-		target_compile_options(${TARGET} PRIVATE "/W${MO2_WARNINGS}" "/wd4464")
+		if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+			string(TOLOWER ${MO2_WARNINGS} MO2_WARNINGS)
+			target_compile_options(${TARGET} PRIVATE "/W${MO2_WARNINGS}" "/wd4464")
 
-		# external warnings
-		if (${MO2_EXTERNAL} STREQUAL "OFF")
-			target_compile_options(${TARGET}
-				PRIVATE "/external:anglebrackets" "/external:W0")
+			# external warnings
+			if (${MO2_EXTERNAL} STREQUAL "OFF")
+				target_compile_options(${TARGET}
+					PRIVATE "/external:anglebrackets" "/external:W0")
+			else()
+				string(TOLOWER ${MO2_EXTERNAL} MO2_EXTERNAL)
+				target_compile_options(${TARGET}
+					PRIVATE "/external:anglebrackets" "/external:W${MO2_EXTERNAL}")
+			endif()
 		else()
-			string(TOLOWER ${MO2_EXTERNAL} MO2_EXTERNAL)
-			target_compile_options(${TARGET}
-				PRIVATE "/external:anglebrackets" "/external:W${MO2_EXTERNAL}")
+			target_compile_options(${TARGET} PRIVATE "-Wall" "-Wextra" "-Wno-unknown-pragmas")
 		endif()
 	endif()
 
@@ -112,7 +116,19 @@ function(mo2_configure_sources TARGET)
 	file(GLOB_RECURSE ui_header_files CONFIGURE_DEPENDS ${UI_HEADERS_DIR}/*.h)
 	file(GLOB_RECURSE rule_files CONFIGURE_DEPENDS ${CMAKE_BINARY_DIR}/*.rule)
 
-
+	# exclude os-specific files
+	if (UNIX)
+		set(EXCLUDE_FILTER "win32")
+	else ()
+		set(EXCLUDE_FILTER "linux")
+	endif ()
+	list(FILTER source_files EXCLUDE REGEX ${EXCLUDE_FILTER})
+	list(FILTER header_files EXCLUDE REGEX ${EXCLUDE_FILTER})
+	list(FILTER qrc_files EXCLUDE REGEX ${EXCLUDE_FILTER})
+	list(FILTER rc_files EXCLUDE REGEX ${EXCLUDE_FILTER})
+	list(FILTER ui_files EXCLUDE REGEX ${EXCLUDE_FILTER})
+	list(FILTER ui_header_files EXCLUDE REGEX ${EXCLUDE_FILTER})
+	list(FILTER rule_files EXCLUDE REGEX ${EXCLUDE_FILTER})
 
 	if (${MO2_SOURCE_TREE})
 		mo2_default_source_group(NO_SRC)
@@ -198,6 +214,42 @@ function(mo2_configure_msvc TARGET)
 
 endfunction()
 
+
+#! mo2_configure_gcc : set flags for C++ target with GCC
+#
+# \param:PERMISSIVE permissive mode (default OFF)
+# \param:BIGOBJ enable bigobj (default OFF)
+#
+function(mo2_configure_gcc TARGET)
+    cmake_parse_arguments(MO2 "" "PERMISSIVE;BIGOBJ" "" ${ARGN})
+
+	set_target_properties(${TARGET} PROPERTIES
+		CXX_STANDARD 23 CXX_EXTENSIONS OFF)
+
+	if(${MO2_PERMISSIVE})
+		target_compile_options(${TARGET} PRIVATE "-fpermissive")
+	endif()
+
+	if(${MO2_BIGOBJ})
+		target_compile_options(${TARGET} PRIVATE "-Wa,-mbig-obj")
+	endif()
+
+	# set compiler threads to host core count
+	if (NOT CMAKE_BUILD_PARALLEL_LEVEL)
+		include(ProcessorCount)
+		ProcessorCount(HOST_PROC_COUNT)
+		set(CMAKE_BUILD_PARALLEL_LEVEL ${HOST_PROC_COUNT})
+	endif ()
+
+	# enable link-time optimization
+    target_link_options(${TARGET}
+            PRIVATE
+            $<$<CONFIG:Release,RelWithDebInfo>:
+            -flto=auto
+            >)
+
+endfunction()
+
 #! mo2_configure_target : do basic configuration for a MO2 C++ target
 #
 # this functions does many things:
@@ -234,7 +286,13 @@ function(mo2_configure_target TARGET)
 	mo2_set_if_not_defined(MO2_EXTRA_TRANSLATIONS "")
 
 	mo2_configure_warnings(${TARGET} ${ARGN})
-	mo2_configure_msvc(${TARGET} ${ARGN})
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+		mo2_configure_msvc(${TARGET} ${ARGN})
+	elseif (CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang)$")
+		mo2_configure_gcc(${TARGET} ${ARGN})
+	else ()
+		message(FATAL_ERROR "Unsupported compiler ${CMAKE_CXX_COMPILER_ID}")
+	endif()
 
 	if (NOT MO2_NO_SOURCES)
 		mo2_configure_sources(${TARGET} ${ARGN})
@@ -333,16 +391,24 @@ endfunction()
 function(mo2_install_plugin TARGET)
 	cmake_parse_arguments(MO2 "FOLDER" "" "" ${ARGN})
 
-	if (${MO2_FOLDER})
-		install(TARGETS ${TARGET} RUNTIME DESTINATION ${MO2_INSTALL_BIN}/plugins/$<TARGET_FILE_BASE_NAME:${TARGET}>)
+	if (UNIX)
+		set(TYPE LIBRARY)
 	else()
-		install(TARGETS ${TARGET} RUNTIME DESTINATION ${MO2_INSTALL_BIN}/plugins)
+		set(TYPE RUNTIME)
+	endif()
+
+	if (${MO2_FOLDER})
+		install(TARGETS ${TARGET} ${TYPE} DESTINATION ${MO2_INSTALL_BIN}/plugins/$<TARGET_FILE_BASE_NAME:${TARGET}>)
+	else()
+		install(TARGETS ${TARGET} ${TYPE} DESTINATION ${MO2_INSTALL_BIN}/plugins)
 	endif()
 
 	if (NOT MO2_INSTALL_IS_BIN)
 		install(TARGETS ${TARGET} ARCHIVE DESTINATION lib)
-		# install PDB if possible
-		install(FILES $<TARGET_PDB_FILE:${TARGET}> DESTINATION pdb OPTIONAL)
+		if (WIN32)
+			# install PDB if possible
+			install(FILES $<TARGET_PDB_FILE:${TARGET}> DESTINATION pdb OPTIONAL)
+		endif()
 	endif()
 
 endfunction()

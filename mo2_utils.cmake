@@ -344,7 +344,7 @@ function(mo2_add_lupdate TARGET)
 		set(lupdate_command
 			${CMAKE_COMMAND}
 			-E env PYTHONPATH=${MO2_PYLIBS_DIR}
-			${MO2_PYLIBS_DIR}/bin/pylupdate${MO2_QT_VERSION_MAJOR}.exe
+			${MO2_PYLIBS_DIR}/bin/pylupdate${MO2_QT_VERSION_MAJOR}${CMAKE_EXECUTABLE_SUFFIX}
 			--ts "${MO2_TS_FILE}" ${translation_files})
 
 		add_dependencies("${TARGET}_lupdate" PyQt6)

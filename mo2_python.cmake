@@ -123,7 +123,7 @@ function(mo2_python_uifiles TARGET)
 		add_custom_command(
 			OUTPUT "${output}"
 			COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${CMAKE_BINARY_DIR}/pylibs
-				${MO2_PYLIBS_DIR}/bin/pyuic${MO2_QT_VERSION_MAJOR}.exe
+				${MO2_PYLIBS_DIR}/bin/pyuic${MO2_QT_VERSION_MAJOR}${CMAKE_EXECUTABLE_SUFFIX}
 				-o "${output}"
 				"${UI_FILE}"
 			DEPENDS "${UI_FILE}"

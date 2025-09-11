@@ -118,9 +118,9 @@ function(mo2_configure_sources TARGET)
 
 	# exclude os-specific files
 	if (UNIX)
-		set(EXCLUDE_FILTER "win32")
+		set(EXCLUDE_FILTER "${PROJECT_SOURCE_DIR}.*/win32/")
 	else ()
-		set(EXCLUDE_FILTER "linux")
+		set(EXCLUDE_FILTER "${PROJECT_SOURCE_DIR}.*/linux/")
 	endif ()
 	list(FILTER source_files EXCLUDE REGEX ${EXCLUDE_FILTER})
 	list(FILTER header_files EXCLUDE REGEX ${EXCLUDE_FILTER})

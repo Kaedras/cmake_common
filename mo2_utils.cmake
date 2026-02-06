@@ -213,10 +213,13 @@ function(mo2_deploy_qt)
 		--verbose 0
 		--webenginewidgets
 		--websockets
-		--networkauth
 		--openglwidgets
 		--libdir dlls
 		--no-compiler-runtime)
+
+	if(MO2_QT_VERSION VERSION_LESS "6.10.0")
+        list(APPEND args --networkauth)
+    endif()
 
 	if(${DEPLOY_NOPLUGINS})
 		list(APPEND args --no-plugins)
@@ -278,14 +281,28 @@ function(mo2_deploy_qt)
 	if(NOT ${DEPLOY_NOPLUGINS})
 		set(qtwebengine_process_exe $<IF:$<CONFIG:Debug>,QtWebEngineProcessd.exe,QtWebEngineProcess.exe>)
 		install(CODE "
-			file(RENAME \"${bin}/dlls/${qtwebengine_process_exe}\" \"${bin}/${qtwebengine_process_exe}\")
-			file(RENAME \"${bin}/qtplugins/platforms\" \"${bin}/platforms\")
-			file(RENAME \"${bin}/qtplugins/styles\" \"${bin}/styles\")
-			file(RENAME \"${bin}/qtplugins/imageformats\" \"${bin}/dlls/imageformats\")
-			file(RENAME \"${bin}/qtplugins/tls\" \"${bin}/dlls/tls\")
+			if(EXISTS \"${bin}/dlls/${qtwebengine_process_exe}\")
+				message(STATUS \"[MO2] Moving ${qtwebengine_process_exe} to root...\")
+				file(RENAME \"${bin}/dlls/${qtwebengine_process_exe}\" \"${bin}/${qtwebengine_process_exe}\")
+			endif()
+
+			foreach(_dir platforms styles)
+				if(EXISTS \"${bin}/qtplugins/\${_dir}\")
+					file(REMOVE_RECURSE \"${bin}/\${_dir}\")
+					file(RENAME \"${bin}/qtplugins/\${_dir}\" \"${bin}/\${_dir}\")
+				endif()
+			endforeach()
+
+			foreach(_dir imageformats tls)
+				if(EXISTS \"${bin}/qtplugins/\${_dir}\")
+					file(REMOVE_RECURSE \"${bin}/dlls/\${_dir}\")
+					file(RENAME \"${bin}/qtplugins/\${_dir}\" \"${bin}/dlls/\${_dir}\")
+				endif()
+			endforeach()
+
 			file(REMOVE_RECURSE \"${bin}/qtplugins\")
-		")
-	endif()
+			")
+    endif()
 endfunction()
 
 #! mo2_add_lupdate : generate .ts files from the given sources

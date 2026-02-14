@@ -5,6 +5,9 @@ include(${CMAKE_CURRENT_LIST_DIR}/mo2_utils.cmake)
 set(MO2_PYLIBS_DIR "${CMAKE_BINARY_DIR}/pylibs" CACHE PATH
     "default for path for Python libraries")
 
+option(MO2_SKIP_PYTHON_DEPS
+        "skip python dependency installation" OFF)
+
 #! mo2_python_pip_install : run "pip install ..."
 #
 # \param:TARGET target to install Python package for
@@ -13,6 +16,11 @@ set(MO2_PYLIBS_DIR "${CMAKE_BINARY_DIR}/pylibs" CACHE PATH
 #   "PyQt6==6.3.0"
 #
 function(mo2_python_pip_install TARGET)
+	if (MO2_SKIP_PYTHON_DEPS)
+        message(STATUS "[MO2] skipping python dependency installation")
+        return()
+	endif()
+
 	cmake_parse_arguments(MO2
 		"NO_DEPENDENCIES;PRE_RELEASE;NO_FORCE;USE_CACHE" "DIRECTORY" "PACKAGES;EXTRA_INDEX_URLS" ${ARGN})
 
@@ -119,11 +127,19 @@ function(mo2_python_uifiles TARGET)
 			set(folder "${CMAKE_CURRENT_BINARY_DIR}")
 		endif()
 
+        if(MO2_SKIP_PYTHON_DEPS)
+            set(pythonpath "")
+            set(pyuic_path "")
+        else()
+            set(pythonpath "PYTHONPATH=${CMAKE_BINARY_DIR}/pylibs")
+            set(pyuic_path ${MO2_PYLIBS_DIR}/bin/)
+        endif()
+
 		set(output "${folder}/${name}.py")
 		add_custom_command(
 			OUTPUT "${output}"
-			COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${CMAKE_BINARY_DIR}/pylibs
-				${MO2_PYLIBS_DIR}/bin/pyuic${MO2_QT_VERSION_MAJOR}${CMAKE_EXECUTABLE_SUFFIX}
+			COMMAND ${CMAKE_COMMAND} -E env ${pythonpath}
+				${pyuic_path}pyuic${MO2_QT_VERSION_MAJOR}${CMAKE_EXECUTABLE_SUFFIX}
 				-o "${output}"
 				"${UI_FILE}"
 			DEPENDS "${UI_FILE}"
@@ -152,6 +168,10 @@ endfunction()
 # \param:LIBDIR library to install requirements to
 #
 function(mo2_python_requirements TARGET)
+    if (MO2_SKIP_PYTHON_DEPS)
+        message(STATUS "[MO2] skipping python dependency installation")
+        return()
+    endif()
 	cmake_parse_arguments(MO2 "" "LIBDIR" "" ${ARGN})
 
 	mo2_find_python_executable(PYTHON_EXE)

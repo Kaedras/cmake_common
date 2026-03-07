@@ -446,7 +446,7 @@ function(mo2_install_pdb)
                 ADDITIONAL_CLEAN_FILES
                 $<TARGET_FILE:${MO2_TARGET}>.dbg
         )
-        install(FILE $<TARGET_FILE:${MO2_TARGET}>.dbg DESTINATION debug)
+        install(FILES $<TARGET_FILE:${MO2_TARGET}>.dbg DESTINATION debug)
     else()
         install(FILES $<TARGET_PDB_FILE:${MO2_TARGET}> DESTINATION pdb $<MO2_OPTIONAL:OPTIONAL>)
     endif()

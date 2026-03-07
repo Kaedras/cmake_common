@@ -433,7 +433,6 @@ function(mo2_install_pdb)
                 COMMAND ${CMAKE_OBJCOPY} ARGS --strip-debug $<TARGET_FILE:${MO2_TARGET}>
                 # Link the Separate Debug Information with the Final Release
                 COMMAND ${CMAKE_OBJCOPY} ARGS --add-gnu-debuglink=$<TARGET_FILE:${MO2_TARGET}>.dbg $<TARGET_FILE:${MO2_TARGET}>
-                DEPENDS ${MO2_TARGET}
                 POST_BUILD
         )
         # NOTE: Add this to the clean target

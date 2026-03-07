@@ -420,21 +420,20 @@ function(mo2_install_pdb)
     cmake_parse_arguments(MO2 "OPTIONAL" "TARGET" "" ${ARGN})
 
     if(UNIX)
-        # modified version of https://stackoverflow.com/a/78987613
-        set(DBG_FILE $<TARGET_FILE_DIR:${MO2_TARGET}>/debug/$<TARGET_FILE_NAME:${MO2_TARGET}>.dbg)
+        # from https://stackoverflow.com/a/78987613
         # NOTE: The dbg extension is used solely because it is used as a standard
         # NOTE: In Linux documentation etc.
         # NOTE: Obtained from https://www.man7.org/linux/man-pages/man1/objcopy.1.html
         add_custom_command(
-                TARGET ${MO2_TARGET}
+                TARGET ${TARGET}
                 # Separate the Debug Information from the Target file
-                COMMAND ${CMAKE_OBJCOPY} ARGS --only-keep-debug $<TARGET_FILE:${MO2_TARGET}> ${DBG_FILE}
+                COMMAND ${CMAKE_OBJCOPY} ARGS --only-keep-debug $<TARGET_FILE:${MO2_TARGET}> $<TARGET_FILE:${MO2_TARGET}>.dbg
                 # As we have previously separated the debug information from the
                 # previous output, remove all debug information from the same
                 COMMAND ${CMAKE_OBJCOPY} ARGS --strip-debug $<TARGET_FILE:${MO2_TARGET}>
                 # Link the Separate Debug Information with the Final Release
-                COMMAND ${CMAKE_OBJCOPY} ARGS --add-gnu-debuglink=${DBG_FILE} $<TARGET_FILE:${MO2_TARGET}>
-                DEPENDS ${TARGET}
+                COMMAND ${CMAKE_OBJCOPY} ARGS --add-gnu-debuglink=$<TARGET_FILE:${MO2_TARGET}>.dbg $<TARGET_FILE:${MO2_TARGET}>
+                DEPENDS ${MO2_TARGET}
                 POST_BUILD
         )
         # NOTE: Add this to the clean target
@@ -445,8 +444,9 @@ function(mo2_install_pdb)
                 APPEND
                 PROPERTY
                 ADDITIONAL_CLEAN_FILES
-                ${DBG_FILE}
+                $<TARGET_FILE:${MO2_TARGET}>.dbg
         )
+        install(FILE $<TARGET_FILE:${MO2_TARGET}>.dbg DESTINATION debug)
     else()
         install(FILES $<TARGET_PDB_FILE:${MO2_TARGET}> DESTINATION pdb $<MO2_OPTIONAL:OPTIONAL>)
     endif()

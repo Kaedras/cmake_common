@@ -425,7 +425,7 @@ function(mo2_install_pdb)
         # NOTE: In Linux documentation etc.
         # NOTE: Obtained from https://www.man7.org/linux/man-pages/man1/objcopy.1.html
         add_custom_command(
-                TARGET ${TARGET}
+                TARGET ${MO2_TARGET}
                 # Separate the Debug Information from the Target file
                 COMMAND ${CMAKE_OBJCOPY} ARGS --only-keep-debug $<TARGET_FILE:${MO2_TARGET}> $<TARGET_FILE:${MO2_TARGET}>.dbg
                 # As we have previously separated the debug information from the

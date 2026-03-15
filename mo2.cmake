@@ -24,6 +24,12 @@ endif()
 # this find Python globally rather than virtual environments, even when one is active
 set(Python_FIND_VIRTUALENV STANDARD)
 
+if (UNIX)
+    # required because CMAKE_MAP_IMPORTED_CONFIG is set below and would result in linker errors and
+    # `IMPORTED_LOCATION not set for imported target "OpenGL::OpenGL"`
+    find_package(OpenGL REQUIRED)
+endif()
+
 # this set the imported location of targets for missing configurations - this silents
 # many CMP0111 warnings from CMake
 set(CMAKE_MAP_IMPORTED_CONFIG_MINSIZEREL MinSizeRel RelWithDebInfo Release None)

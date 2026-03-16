@@ -3,6 +3,24 @@ cmake_minimum_required(VERSION 3.21)
 include(CMakeParseArguments)
 include(${CMAKE_CURRENT_LIST_DIR}/mo2_utils.cmake)
 
+#! mo2_fix_imported_location : fixes imported locations for cmake targets caused by setting `CMAKE_MAP_IMPORTED_CONFIG`
+#
+# \param:TARGET CMake target to fix
+function(mo2_fix_imported_location TARGET)
+    if(TARGET ${TARGET})
+        get_target_property(location ${TARGET} IMPORTED_LOCATION)
+        if(location)
+            # Set all config variants to the same location
+            set_target_properties(${TARGET} PROPERTIES
+                    IMPORTED_LOCATION_DEBUG "${location}"
+                    IMPORTED_LOCATION_RELEASE "${location}"
+                    IMPORTED_LOCATION_RELWITHDEBINFO "${location}"
+                    IMPORTED_LOCATION_MINSIZEREL "${location}"
+            )
+        endif()
+    endif()
+endfunction()
+
 #! mo2_configure_warnings : configuration warning for C++ target
 #
 # \param:WARNINGS level of warnings, possible values are ON/All, OFF, or 1, 2, 3, 4
@@ -317,7 +335,14 @@ function(mo2_configure_target TARGET)
 	if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/pch.h)
 		target_precompile_headers(${PROJECT_NAME}
 			PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/pch.h)
-	endif()
+    endif()
+
+    # Fix OpenGL imported location
+    if(UNIX)
+        mo2_fix_imported_location(OpenGL::OpenGL)
+        mo2_fix_imported_location(OpenGL::GLX)
+    endif()
+
 endfunction()
 
 #! mo2_configure_tests : configure a target as a MO2 C++ tests

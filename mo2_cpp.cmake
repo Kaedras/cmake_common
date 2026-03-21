@@ -445,6 +445,7 @@ function(mo2_install_pdb)
     cmake_parse_arguments(MO2 "OPTIONAL" "TARGET" "" ${ARGN})
 
     if(UNIX)
+#[[
         # from https://stackoverflow.com/a/78987613
         # NOTE: The dbg extension is used solely because it is used as a standard
         # NOTE: In Linux documentation etc.
@@ -471,6 +472,7 @@ function(mo2_install_pdb)
                 $<TARGET_FILE:${MO2_TARGET}>.dbg
         )
         install(FILES $<TARGET_FILE:${MO2_TARGET}>.dbg DESTINATION debug)
+]]
     else()
         if(${MO2_OPTIONAL})
             install(FILES $<TARGET_PDB_FILE:${MO2_TARGET}> DESTINATION pdb OPTIONAL)

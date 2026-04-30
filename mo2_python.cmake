@@ -262,7 +262,9 @@ function(mo2_configure_python_module TARGET)
 		PATTERN ".github" EXCLUDE
 		PATTERN ".tox" EXCLUDE
 		PATTERN ".mypy_cache" EXCLUDE
-		PATTERN "vsbuild" EXCLUDE)
+		PATTERN "vsbuild" EXCLUDE
+		PATTERN "build" EXCLUDE
+    )
 
 	# copy the resource directory if it exists
 	if(EXISTS "${res_dir}")

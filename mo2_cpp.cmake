@@ -418,7 +418,7 @@ function(mo2_install_plugin TARGET)
 
 	if (UNIX)
 		set(TYPE LIBRARY)
-		set_target_properties(${TARGET} PROPERTIES INSTALL_RPATH ".:./lib/")
+		set_target_properties(${TARGET} PROPERTIES INSTALL_RPATH "$ORIGIN;$ORIGIN/lib")
 	else()
 		set(TYPE RUNTIME)
 	endif()

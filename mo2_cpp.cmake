@@ -133,6 +133,7 @@ function(mo2_configure_sources TARGET)
 	file(GLOB_RECURSE ui_files CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.ui)
 	file(GLOB_RECURSE ui_header_files CONFIGURE_DEPENDS ${UI_HEADERS_DIR}/*.h)
 	file(GLOB_RECURSE rule_files CONFIGURE_DEPENDS ${CMAKE_BINARY_DIR}/*.rule)
+	file(GLOB_RECURSE manifest_files CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.manifest)
 
 	# exclude os-specific files
 	if (UNIX)
@@ -165,7 +166,8 @@ function(mo2_configure_sources TARGET)
 		${qrc_files}
 		${rc_files}
 		${misc_files}
-		${qm_files})
+		${qm_files}
+		${manifest_files})
 
 endfunction()
 

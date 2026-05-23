@@ -244,7 +244,7 @@ function(mo2_configure_gcc TARGET)
     cmake_parse_arguments(MO2 "" "PERMISSIVE;BIGOBJ" "" ${ARGN})
 
 	set_target_properties(${TARGET} PROPERTIES
-		CXX_STANDARD 23 CXX_EXTENSIONS OFF)
+		CXX_STANDARD 26 CXX_EXTENSIONS OFF)
 
 	if(${MO2_PERMISSIVE})
 		target_compile_options(${TARGET} PRIVATE "-fpermissive")

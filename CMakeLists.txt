@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 
 # at least one language is required to populate CMAKE_SYSTEM_NAME
-project(mo2-cmake VERSION 3.0.0 LANGUAGES CXX)
+project(mo2-cmake VERSION 2.7.0 LANGUAGES CXX)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)

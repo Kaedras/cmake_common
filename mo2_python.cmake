@@ -76,7 +76,8 @@ function(mo2_python_pip_install TARGET)
 				--target="${MO2_DIRECTORY}"
 				--log="${pip_log_file}"
 				${MO2_PACKAGES}
-		COMMAND ${PYTHON_EXE} -c "open('${_success_file}', 'w').close()"
+		COMMAND "${CMAKE_COMMAND}" -E touch "${_success_file}"
+		VERBATIM
 	)
 
 	set(pip_target_name "${TARGET}_pip_${PIP_FILE_LOG}")
@@ -198,8 +199,9 @@ function(mo2_python_requirements TARGET)
 				--target="${MO2_LIBDIR}"
 				--log="${CMAKE_CURRENT_BINARY_DIR}/pip.log"
 				-r "${PROJECT_SOURCE_DIR}/plugin-requirements.txt"
-		COMMAND ${PYTHON_EXE} -c "open('${_success_file}', 'w').close()"
+		COMMAND "${CMAKE_COMMAND}" -E touch "${_success_file}"
 		DEPENDS "${PROJECT_SOURCE_DIR}/plugin-requirements.txt"
+		VERBATIM
 	)
 	add_custom_target("${TARGET}_libs" ALL DEPENDS "${_success_file}")
 	set_target_properties("${TARGET}_libs" PROPERTIES FOLDER autogen)

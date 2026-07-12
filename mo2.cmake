@@ -24,11 +24,13 @@ endif()
 # this find Python globally rather than virtual environments, even when one is active
 set(Python_FIND_VIRTUALENV STANDARD)
 
-# this set the imported location of targets for missing configurations - this silents
-# many CMP0111 warnings from CMake
-set(CMAKE_MAP_IMPORTED_CONFIG_MINSIZEREL MinSizeRel RelWithDebInfo Release None)
-set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO RelWithDebInfo Release MinSizeRel None)
-set(CMAKE_MAP_IMPORTED_CONFIG_RELEASE Release RelWithDebInfo MinSizeRel None)
+if (WIN32)
+    # this set the imported location of targets for missing configurations - this silents
+    # many CMP0111 warnings from CMake
+    set(CMAKE_MAP_IMPORTED_CONFIG_MINSIZEREL MinSizeRel RelWithDebInfo Release None)
+    set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO RelWithDebInfo Release MinSizeRel None)
+    set(CMAKE_MAP_IMPORTED_CONFIG_RELEASE Release RelWithDebInfo MinSizeRel None)
+endif()
 
 # allow setting folder property on targets for better organization in VS
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

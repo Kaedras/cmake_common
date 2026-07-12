@@ -63,7 +63,7 @@ function(mo2_python_pip_install TARGET)
 	# file is always generated (even on failure), so we run a second command after pip
 	# (only if pip succeeds) to generate a success file that we can depend on
 	add_custom_command(
-		OUTPUT "${_success_file}"
+		OUTPUT "${pip_log_file}" "${_success_file}"
 		COMMAND ${PYTHON_EXE}
 				-I
 				-m pip

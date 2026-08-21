@@ -234,6 +234,11 @@ function(mo2_configure_python_module TARGET)
 	# py files
 	file(GLOB_RECURSE py_files CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.py)
 
+    if (UNIX)
+        # exclude files in venv
+        list(FILTER py_files EXCLUDE REGEX "${CMAKE_BINARY_DIR}/venv/.*")
+    endif()
+
 	set(all_src_files ${py_files} ${ui_files} ${qrc_files})
 
 	set(src_files ${all_src_files})

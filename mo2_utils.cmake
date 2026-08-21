@@ -53,18 +53,13 @@ function(mo2_find_python_executable VARNAME)
 	endif()
 
 	if(UNIX)
-		# use a virtual environment to ensure that pip is available
-		# `python -m ensurepip --upgrade` is usually disabled because it could conflict with system packages
+		# try to use a virtual environment
 		set(VENV_DIR "${CMAKE_BINARY_DIR}/venv")
-		set(PYTHON_VENV_EXECUTABLE "${VENV_DIR}/bin/python")
-
-		# create venv
-		execute_process(COMMAND ${Python_EXECUTABLE} -m venv "${VENV_DIR}" COMMAND_ERROR_IS_FATAL ANY)
-
-		# run ensurepip
-		execute_process(COMMAND ${PYTHON_VENV_EXECUTABLE} -m ensurepip --upgrade COMMAND_ERROR_IS_FATAL ANY)
-
-		set(${VARNAME} ${PYTHON_VENV_EXECUTABLE} PARENT_SCOPE)
+        if(EXISTS "${VENV_DIR}")
+            set(${VARNAME} "${VENV_DIR}/bin/python" PARENT_SCOPE)
+        else()
+            set(${VARNAME} ${Python_EXECUTABLE} PARENT_SCOPE)
+        endif()
 	else()
 		set(${VARNAME} ${Python_EXECUTABLE} PARENT_SCOPE)
 	endif()
@@ -490,6 +485,27 @@ function(mo2_add_translations TARGET)
 		add_dependencies(${TARGET} ${TARGET}_lupdate)
 	endif()
 
+endfunction()
+
+#! mo2_create_venv : create a python virtual environment
+#
+# \param:VENV_DIR path to create the virtual environment in
+function(mo2_create_venv VENV_DIR)
+    if (NOT DEFINED Python_EXECUTABLE)
+        find_package(Python ${MO2_PYTHON_VERSION} EXACT COMPONENTS Interpreter REQUIRED)
+    endif()
+
+    # create venv
+    execute_process(COMMAND ${Python_EXECUTABLE} -m venv "${VENV_DIR}" COMMAND_ERROR_IS_FATAL ANY)
+
+    if(UNIX)
+        set(PYTHON_VENV_EXECUTABLE "${VENV_DIR}/bin/python")
+    else()
+        set(PYTHON_VENV_EXECUTABLE "${VENV_DIR}/Scripts/python.exe")
+    endif()
+
+    # run ensurepip
+    execute_process(COMMAND ${PYTHON_VENV_EXECUTABLE} -m ensurepip --upgrade COMMAND_ERROR_IS_FATAL ANY)
 endfunction()
 
 set(MO2_UTILS_DEFINED TRUE)

@@ -377,6 +377,11 @@ function(mo2_configure_python TARGET)
 		message(FATAL_ERROR "mo2_configure_python should be called with either SIMPLE or MODULE")
 	endif()
 
+    if (UNIX)
+        # create venv to ensure that pip is available
+        mo2_create_venv("${CMAKE_BINARY_DIR}/venv")
+    endif()
+
     if (${MO2_MODULE})
         mo2_configure_python_module(${TARGET} ${ARGN})
     else()

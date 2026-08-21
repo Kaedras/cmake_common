@@ -51,7 +51,23 @@ function(mo2_find_python_executable VARNAME)
 	if (NOT DEFINED Python_EXECUTABLE)
 		find_package(Python ${MO2_PYTHON_VERSION} EXACT COMPONENTS Interpreter REQUIRED)
 	endif()
-	set(${VARNAME} ${Python_EXECUTABLE} PARENT_SCOPE)
+
+	if(UNIX)
+		# use a virtual environment to ensure that pip is available
+		# `python -m ensurepip --upgrade` is usually disabled because it could conflict with system packages
+		set(VENV_DIR "${CMAKE_BINARY_DIR}/venv")
+		set(PYTHON_VENV_EXECUTABLE "${VENV_DIR}/bin/python")
+
+		# create venv
+		execute_process(COMMAND ${Python_EXECUTABLE} -m venv "${VENV_DIR}" COMMAND_ERROR_IS_FATAL ANY)
+
+		# run ensurepip
+		execute_process(COMMAND ${PYTHON_VENV_EXECUTABLE} -m ensurepip --upgrade COMMAND_ERROR_IS_FATAL ANY)
+
+		set(${VARNAME} ${PYTHON_VENV_EXECUTABLE} PARENT_SCOPE)
+	else()
+		set(${VARNAME} ${Python_EXECUTABLE} PARENT_SCOPE)
+	endif()
 endfunction()
 
 #! mo2_find_git_hash : find the git hash of HEAD on the current source project

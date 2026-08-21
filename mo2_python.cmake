@@ -351,7 +351,8 @@ function(mo2_configure_python_simple TARGET)
 		FILES_MATCHING
 		PATTERN "*.py"
 		PATTERN "CMakeFiles" EXCLUDE
-		PATTERN "x64" EXCLUDE)
+		PATTERN "x64" EXCLUDE
+		PATTERN "venv" EXCLUDE)
 
 endfunction()
 
